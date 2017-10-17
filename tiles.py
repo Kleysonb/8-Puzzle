@@ -2,6 +2,7 @@ from random import *
 from turtle import *
 from freegames import floor, vector
 
+
 tiles = {}
 neighbors = [
     vector(100, 0), #Direita
@@ -21,6 +22,30 @@ telhas = [
     vector(-100, -200),     #8
     vector(0, -200)         #none
 ]
+
+
+#-------------------------------------------------------------------------------------------------------------#
+#                                           Algoritmo Genetico                                                #
+
+populacao = []
+cromossomo = []
+
+def gerarPopulacao(num):
+    for pessoa in range(num):
+        cromossomo = []
+        for cromo in range(30):
+            movimento = random.sample([1, 2, 3, 4, 5],  3)   
+            cromossomo.append(movimento)
+        populacao.append(cromossomo)
+        #del cromossomo[:]
+    print populacao
+    
+#-------------------------------------------------------------------------------------------------------------#
+
+
+
+#-------------------------------------------------------------------------------------------------------------#
+#                                            Montagem do Jogo                                                 #
 
 def load():
     #Carregar telhas e arrumar
@@ -131,6 +156,9 @@ onkey(lambda: change(1), 'Right')
 onkey(lambda: change(2), 'Left')
 onkey(lambda: change(3), 'Up')
 onkey(lambda: change(4), 'Down')
+onkey(lambda: gerarPopulacao(4), 's')
+
 
 #onscreenclick(tap)
 done()
+#-------------------------------------------------------------------------------------------------------------#
