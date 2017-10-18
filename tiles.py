@@ -29,11 +29,12 @@ telhas = [
 #                                           Algoritmo Genetico                                                #
 
 populacao = []
-cromossomo = []
+#cromossomo = []
+elitizacao = []
 
 #Gerar Populacao
 def gerarPopulacao(num):
-    populacao = []
+    #populacao = []
     for pessoa in range(num):
         cromossomo = []
         for cromo in range(30):
@@ -41,82 +42,131 @@ def gerarPopulacao(num):
             movimento = choice([1,2,3,4])
             cromossomo.append(movimento)
         populacao.append(cromossomo)
+
     #print populacao[0]
+    #print calcularFitness(populacao[0])
+    '''
+    print populacao[0]
     print calcularFitness(populacao[0])
+    print "--------------------------------------------"
+    print populacao[1]
     print calcularFitness(populacao[1])
+    print "--------------------------------------------"
+    print populacao[2]
     print calcularFitness(populacao[2])
+    print "--------------------------------------------"
+    print populacao[3]
     print calcularFitness(populacao[3])
     print "--------------------------------------------"
+    '''
+    print "--------------------------------------------"
+    for pessoa in range(len(populacao)):
+        print calcularFitness(populacao[pessoa])
+    print "--------------------------------------------"
+    for pessoa in range(len(populacao)):
+        print calcularFitness(populacao[pessoa])
+    print "--------------------------------------------"
+    for pessoa in range(len(populacao)):
+        print calcularFitness(populacao[pessoa])
+    print "--------------------------------------------"
+    #selecionarElite()
+
+def selecionarElite():
+    #print range(len(populacao))
     
+    for elite in range(8):
+        populacaoAux = populacao
+        fitnessAuxiliar = 0
+        indice = 0
+        for pessoa in range(len(populacaoAux)):
+            aux = calcularFitness(populacaoAux[pessoa])
+            if aux > fitnessAuxiliar:
+                fitnessAuxiliar = aux
+                indice = pessoa
+        
+        print 'removeu'
+        print indice
+        populacaoAux.pop(indice)
+
+        
+    for pessoa in range(len(populacaoAux)):
+        print populacaoAux[pessoa]
+        print calcularFitness(populacaoAux[pessoa])
+    print "--------------------------------------------"
+
 #Funcao Fitness
-def calcularFitness(cromossomo):
+def calcularFitness(cromo):
     auxiliar = tiles
-    fitness = 0
+    #fitness = 0
     for item in range(30):    
-        x = cromossomo[item]
-        #time.sleep(1)
+        x = cromo[item]
+        #time.sleep(0.300)
         #change(x)
         if x == 1:
             #Direita
+            #print 'direita'
             neighbor = neighbors[0]
         elif x == 2:
             #Esquerda
+            #print 'esquerda'
             neighbor = neighbors[1]
         elif x == 3:
             #Sobir
+            #print 'sobir'
             neighbor = neighbors[2]
         elif x == 4:
             #Descer
+            #print 'descer'
             neighbor = neighbors[3]
 
     movimento = False
     for telha in auxiliar:
         spot = telha + neighbor
 
-        if spot in tiles and auxiliar[spot] is None:
+        if spot in auxiliar and auxiliar[spot] is None:
             number = auxiliar[telha]
             auxiliar[telha] = None
             auxiliar[spot] = number
             movimento = True
             break
-    if not movimento:
+    '''if not movimento:
         print 'movimento invalido'
-        #fitness-=1
+        #fitness-=1'''
 
+    return foraDoLugar(auxiliar)
     
-    
+
+def foraDoLugar(auxiliar):
     posicao = vector(-200, 0)
-    if auxiliar[posicao] == 1:
+    fitness = 0;
+    if auxiliar[posicao] != 1:
         fitness+=1
     posicao = vector(-100, 0)
-    if auxiliar[posicao] == 2:
+    if auxiliar[posicao] != 2:
         fitness+=1
     posicao = vector(0, 0)
-    if auxiliar[posicao] == 3:
+    if auxiliar[posicao] != 3:
         fitness+=1
     posicao = vector(-200, -100)
-    if auxiliar[posicao] == 4:
+    if auxiliar[posicao] != 4:
         fitness+=1
     posicao = vector(-100, -100)
-    if auxiliar[posicao] == 5:
+    if auxiliar[posicao] != 5:
         fitness+=1
     posicao = vector(0, -100)
-    if auxiliar[posicao] == 6:
+    if auxiliar[posicao] != 6:
         fitness+=1
     posicao = vector(-200, -200)
-    if auxiliar[posicao] == 7:
+    if auxiliar[posicao] != 7:
         fitness+=1
     posicao = vector(-100, -200)
-    if auxiliar[posicao] == 8:
+    if auxiliar[posicao] != 8:
         fitness+=1
     posicao = vector(0, -200)
-    if auxiliar[posicao] == None:
+    if auxiliar[posicao] != None:
         fitness+=1
     
     return fitness
-
-        
-        
 
 #-------------------------------------------------------------------------------------------------------------#
 
@@ -238,7 +288,7 @@ onkey(lambda: change(1), 'Right')
 onkey(lambda: change(2), 'Left')
 onkey(lambda: change(3), 'Up')
 onkey(lambda: change(4), 'Down')
-onkey(lambda: gerarPopulacao(4), 's')
+onkey(lambda: gerarPopulacao(12), 'g')
 
 
 #onscreenclick(tap)
