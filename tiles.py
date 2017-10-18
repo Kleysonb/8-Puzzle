@@ -1,6 +1,7 @@
 from random import *
 from turtle import *
 from freegames import floor, vector
+import time
 
 
 tiles = {}
@@ -30,16 +31,93 @@ telhas = [
 populacao = []
 cromossomo = []
 
+#Gerar Populacao
 def gerarPopulacao(num):
+    populacao = []
     for pessoa in range(num):
         cromossomo = []
         for cromo in range(30):
-            movimento = random.sample([1, 2, 3, 4, 5],  3)   
+            #Definindo Movimentos Aleatorios
+            movimento = choice([1,2,3,4])
             cromossomo.append(movimento)
         populacao.append(cromossomo)
-        #del cromossomo[:]
-    print populacao
+    #print populacao[0]
+    print calcularFitness(populacao[0])
+    print calcularFitness(populacao[1])
+    print calcularFitness(populacao[2])
+    print calcularFitness(populacao[3])
+    print "--------------------------------------------"
     
+#Funcao Fitness
+def calcularFitness(cromossomo):
+    auxiliar = tiles
+    fitness = 0
+    for item in range(30):    
+        x = cromossomo[item]
+        #time.sleep(1)
+        #change(x)
+        if x == 1:
+            #Direita
+            neighbor = neighbors[0]
+        elif x == 2:
+            #Esquerda
+            neighbor = neighbors[1]
+        elif x == 3:
+            #Sobir
+            neighbor = neighbors[2]
+        elif x == 4:
+            #Descer
+            neighbor = neighbors[3]
+
+    movimento = False
+    for telha in auxiliar:
+        spot = telha + neighbor
+
+        if spot in tiles and auxiliar[spot] is None:
+            number = auxiliar[telha]
+            auxiliar[telha] = None
+            auxiliar[spot] = number
+            movimento = True
+            break
+    if not movimento:
+        print 'movimento invalido'
+        #fitness-=1
+
+    
+    
+    posicao = vector(-200, 0)
+    if auxiliar[posicao] == 1:
+        fitness+=1
+    posicao = vector(-100, 0)
+    if auxiliar[posicao] == 2:
+        fitness+=1
+    posicao = vector(0, 0)
+    if auxiliar[posicao] == 3:
+        fitness+=1
+    posicao = vector(-200, -100)
+    if auxiliar[posicao] == 4:
+        fitness+=1
+    posicao = vector(-100, -100)
+    if auxiliar[posicao] == 5:
+        fitness+=1
+    posicao = vector(0, -100)
+    if auxiliar[posicao] == 6:
+        fitness+=1
+    posicao = vector(-200, -200)
+    if auxiliar[posicao] == 7:
+        fitness+=1
+    posicao = vector(-100, -200)
+    if auxiliar[posicao] == 8:
+        fitness+=1
+    posicao = vector(0, -200)
+    if auxiliar[posicao] == None:
+        fitness+=1
+    
+    return fitness
+
+        
+        
+
 #-------------------------------------------------------------------------------------------------------------#
 
 
@@ -60,15 +138,17 @@ def load():
     tiles[mark] = None
 
     #Criar Aleatoriedade
+    '''
     for count in range(1000):
         neighbor = choice(neighbors)
         spot = mark + neighbor
-
+    
         if spot in tiles:
             number = tiles[spot]
             tiles[spot] = None
             tiles[mark] = number
             mark = spot
+    '''
 
 def square(mark, number):
     #Desenhe o quadrado branco com contorno e numero preto
@@ -129,10 +209,12 @@ def change(x):
 
         if spot in tiles and tiles[spot] is None:
             number = tiles[telha]
-            tiles[spot] = number
-            square(spot, number)
             tiles[telha] = None
             square(telha, None)
+
+            tiles[spot] = number
+            square(spot, number)
+            
             movimento = True
             break
     if not movimento:
