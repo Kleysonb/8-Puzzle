@@ -41,7 +41,7 @@ def algoritmoGenetico(qtd_populacao, geracoes):
     for item in range(len(elitizacao)):
         print elitizacao[item]
     menorFitnss = melhorFitnss(elitizacao)
-    posicao = 0
+    
     '''
     for geracao in range(geracoes):
         elitizacao = calcularFitnessGlobal(populacao)
@@ -54,7 +54,8 @@ def algoritmoGenetico(qtd_populacao, geracoes):
         print 1000 - geracao
     '''
     geracao = 1
-    while(menorFitnss > 3 and geracao < 100000):
+    anterior = menorFitnss
+    while(menorFitnss > 0 and geracao < 100000):
         elitizacao = calcularFitnessGlobal(populacao)
         
         pais = selecionarPais(elitizacao, populacao)                                # 6 pais
@@ -63,10 +64,12 @@ def algoritmoGenetico(qtd_populacao, geracoes):
         aleatorios = gerarPopulacao(2)                                              # 2 inidividuos aleatorios
         pais_aleatorios = crossover2(pais, aleatorios)                              # 2 filhos
         populacao = gerarNovaPopulacao(pais, filhos, mutantes, aleatorios, pais_aleatorios)          # 20 pessoas
-        menorFitnss, posicao = melhorFitnss(elitizacao)
-        print '\nGeracao'
-        print geracao
-        print menorFitnss
+        menorFitnss = melhorFitnss(elitizacao)
+        if menorFitnss != anterior:
+            print '\nGeracao'
+            print geracao
+            print menorFitnss
+            anterior = menorFitnss
         geracao+=1
 
     print '--------------------------------------------------------------'
@@ -80,6 +83,9 @@ def algoritmoGenetico(qtd_populacao, geracoes):
     for item in range(len(elitizacao)):
         print elitizacao[item]
     print '--------------------------------------------------------------'
+    posicao = elitizacao.index(menorFitnss)
+    #print posicao 
+    #verificarFitness(populacao[posicao])
     resolverPuzzle(populacao[posicao])
     
 def crossover2(pais, aleatorios):
@@ -126,8 +132,8 @@ def melhorFitnss(elitizacao):
     for item in range(len(elitizacao)):
         if elitizacao[item] < menorFitnss:
             menorFitnss = elitizacao[item]
-            posicao = item
-    return menorFitnss, posicao
+            posicao = copy.copy(item)
+    return menorFitnss
     
 def movimentosPossiveis(cromossomo):
     auxiliar = copy.copy(tiles)
@@ -170,16 +176,21 @@ def movimentosPossiveis(cromossomo):
             if auxiliar[item] == None:
                 posicao = item
                 break
-        #print posicao
-
-        if neighbors[0] + posicao in tiles:
-            movimentos.append(2)
-        if neighbors[1] + posicao in tiles:
-            movimentos.append(1)
-        if neighbors[2] + posicao in tiles:
-            movimentos.append(4)
-        if neighbors[3] + posicao in tiles:
-            movimentos.append(3)    
+        
+        posicao_anterior = cromossomo[len(cromossomo)-1]
+        if posicao_anterior == 1 or posicao_anterior == 2:
+            
+            if neighbors[2] + posicao in auxiliar:
+                movimentos.append(4)
+            if neighbors[3] + posicao in auxiliar:
+                movimentos.append(3)
+        elif posicao_anterior == 3 or posicao_anterior == 4:
+           
+            if neighbors[0] + posicao in auxiliar:
+                movimentos.append(2)
+            if neighbors[1] + posicao in auxiliar:
+                movimentos.append(1)
+        
         return movimentos            
 
 def gerarNovaPopulacao(pais, filhos, mutantes, aleatorios, pais_aleatorios):
@@ -530,6 +541,61 @@ def calcularFitnessGlobal(populacao):
     #selecionarElite(elitizacao)
     return elitizacao
 
+def verificarFitness(cromo):
+    #auxiliar = list(tiles)
+    auxiliar = copy.copy(tiles)
+    fitness = 0
+    #print auxiliar
+    for item in range(30):    
+        x = cromo[item]
+        #time.sleep(0.300)
+        #change(x)
+        if x == 1:
+            #Direita
+            #print 'direita'
+            neighbor = neighbors[0]
+        elif x == 2:
+            #Esquerda
+            #print 'esquerda'
+            neighbor = neighbors[1]
+        elif x == 3:
+            #Sobir
+            #print 'sobir'
+            neighbor = neighbors[2]
+        elif x == 4:
+            #Descer
+            #print 'descer'
+            neighbor = neighbors[3]
+
+        movimento = False
+        #print 'matriz'
+        #print auxiliar
+        for telha in auxiliar:
+            spot = telha + neighbor
+
+            if spot in auxiliar and auxiliar[spot] is None:
+                number = auxiliar[telha]
+                auxiliar[telha] = None
+                auxiliar[spot] = number
+                movimento = True
+                break
+            #if not movimento:
+                #print 'movimento invalido'
+            #    fitness+=1
+    
+    print '-------------------------'
+    print auxiliar
+    f = foraDoLugar(auxiliar)*36
+    i = inversoes(auxiliar)*2
+    d = distanciaManhatan(auxiliar)*18
+    fitness += f + i + d
+    print f
+    print i
+    print d
+    print fitness
+    print '-------------------------'
+    return fitness
+
 #Calcular Fitness do Cromossomo
 def calcularFitness(cromo):
     #auxiliar = list(tiles)
@@ -572,9 +638,19 @@ def calcularFitness(cromo):
             #if not movimento:
                 #print 'movimento invalido'
             #    fitness+=1
-
-    fitness += foraDoLugar(auxiliar) * 36 + inversoes(auxiliar) * 2 + distanciaManhatan(auxiliar) * 10
-    return foraDoLugar(auxiliar)
+    
+    #print '-------------------------'
+    #print auxiliar
+    f = foraDoLugar(auxiliar)*36
+    i = inversoes(auxiliar)*2
+    d = distanciaManhatan(auxiliar)*18
+    fitness += f + i + d
+    #print f
+    #print i
+    #print d
+    #print fitness
+    #print '-------------------------'
+    return fitness
     
 #Funcao de Fitness
 def foraDoLugar(auxiliar):
@@ -660,42 +736,53 @@ def distanciaManhatan(auxiliar):
     return fitness
     
 def inversoes(auxiliar):
+    aux = copy.copy(auxiliar)
+    for item in aux:
+        if aux[item] == None:
+            posicao = item
+            break
 
+    aux[posicao] = 9
     fitness = 0;
 
     posicao_atual = vector(-100, 0)
     posicao_anterior = vector(-200, 0)
-    if auxiliar[posicao_atual] < auxiliar[posicao_anterior]:
+    if aux[posicao_atual] < aux[posicao_anterior]:
         fitness+=1
 
     posicao_atual = vector(0, 0)
     posicao_anterior = vector(-100, 0)
-    if auxiliar[posicao_atual] < auxiliar[posicao_anterior]:
+    if aux[posicao_atual] < aux[posicao_anterior]:
         fitness+=1
 
     posicao_atual = vector(-200, -100)
     posicao_anterior = vector(0, 0)
-    if auxiliar[posicao_atual] < auxiliar[posicao_anterior]:
+    if aux[posicao_atual] < aux[posicao_anterior]:
         fitness+=1
 
     posicao_atual = vector(-100, -100)
     posicao_anterior = vector(-200, -100)
-    if auxiliar[posicao_atual] < auxiliar[posicao_anterior]:
+    if aux[posicao_atual] < aux[posicao_anterior]:
         fitness+=1
 
     posicao_atual = vector(0, -100)
     posicao_anterior = vector(-100, -100)
-    if auxiliar[posicao_atual] < auxiliar[posicao_anterior]:
+    if aux[posicao_atual] < aux[posicao_anterior]:
         fitness+=1
 
     posicao_atual = vector(-200, -200)
     posicao_anterior = vector(0, -100)
-    if auxiliar[posicao_atual] < auxiliar[posicao_anterior]:
+    if aux[posicao_atual] < aux[posicao_anterior]:
         fitness+=1
 
     posicao_atual = vector(-100, -200)
     posicao_anterior = vector(-200, -200)
-    if auxiliar[posicao_atual] < auxiliar[posicao_anterior]:
+    if aux[posicao_atual] < aux[posicao_anterior]:
+        fitness+=1
+
+    posicao_atual = vector(0, -200)
+    posicao_anterior = vector(-100, -200)
+    if aux[posicao_atual] < aux[posicao_anterior]:
         fitness+=1
 
     return fitness
@@ -713,8 +800,9 @@ def resolverPuzzle(movimentos):
 
 def load():
     #Carregar telhas e arrumar
+    '''
     count = 1
-
+   
     for y in range(-200, 100, 100):
         for x in range(-200, 100, 100):
             mark = vector(x, y)
@@ -722,9 +810,28 @@ def load():
             count += 1
 
     tiles[mark] = None
+    '''
+    posicao = vector(-200, 0)
+    tiles[posicao] = 1
+    posicao = vector(-100, 0)
+    tiles[posicao] = 2
+    posicao = vector(0, 0)
+    tiles[posicao] = 3
+    posicao = vector(-200, -100)
+    tiles[posicao] = 4
+    posicao = vector(-100, -100)
+    tiles[posicao] = 5
+    posicao = vector(0, -100)
+    tiles[posicao] = 6
+    posicao = vector(-200, -200)
+    tiles[posicao] = 7
+    posicao = vector(-100, -200)
+    tiles[posicao] = 8
+    posicao = vector(0, -200)
+    tiles[posicao] = None
+    mark = posicao
 
     #Criar Aleatoriedade
-    '''
     for count in range(1000):
         neighbor = choice(neighbors)
         spot = mark + neighbor
@@ -734,7 +841,8 @@ def load():
             tiles[spot] = None
             tiles[mark] = number
             mark = spot
-    '''
+    
+    
 
 def square(mark, number):
     #Desenhe o quadrado branco com contorno e numero preto
